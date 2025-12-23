@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For You</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            overflow-x: hidden;
+            background: linear-gradient(135deg, #1a472a 0%, #2d5f3f 50%, #8b0000 100%);
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .snowflake {
+            position: fixed;
+            top: -10px;
+            color: white;
+            font-size: 1em;
+            animation: fall linear infinite;
+            opacity: 0.8;
+            pointer-events: none;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh);
+            }
+        }
+
+        .lock-screen {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .lock-box {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 50px 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            border: 3px solid #d4af37;
+        }
+
+        .lock-box h2 {
+            color: #8b0000;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .lock-box input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1em;
+            border: 2px solid #d4af37;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .lock-box input:focus {
+            outline: none;
+            border-color: #8b0000;
+        }
+
+        .lock-box button {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1em;
+            border: none;
+            background: #8b0000;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .lock-box button:hover {
+            background: #a52a2a;
+        }
+
+        .error {
+            color: #ff4757;
+            font-size: 0.9em;
+            margin-top: 10px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .error.show {
+            opacity: 1;
+        }
+
+        .content-wrapper {
+            display: none;
+        }
+
+        .content-wrapper.unlocked {
+            display: block;
+        }
+
+        .slide {
+            min-height: 100vh;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .slide.active {
+            display: flex;
+            animation: fadeIn 0.8s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .content {
+            max-width: 700px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 60px 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            border: 3px solid #d4af37;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            color: #8b0000;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        p {
+            font-size: 1.2em;
+            line-height: 1.7;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .date {
+            font-size: 1.3em;
+            color: #2d5f3f;
+            font-weight: 500;
+            margin: 20px 0;
+        }
+
+        .emoji {
+            font-size: 2em;
+            margin: 15px 0;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 100;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 1em;
+            border: 2px solid #d4af37;
+            background: white;
+            color: #8b0000;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            font-weight: 500;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            background: #8b0000;
+            color: white;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2em; }
+            p { font-size: 1.1em; }
+            .content { padding: 40px 25px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="lock-screen" id="lockScreen">
+        <div class="lock-box">
+            <h2>🎄</h2>
+            <p>Enter the password</p>
+            <input type="text" id="passwordInput" placeholder="Type here...">
+            <button onclick="checkPassword()">Enter</button>
+            <div class="error" id="errorMsg">Incorrect password</div>
+        </div>
+    </div>
+
+    <div class="content-wrapper" id="contentWrapper">
+        <div class="slide active" id="slide1">
+            <div class="content">
+                <h1>For my cutie Naomi</h1>
+                <img src="rose guy.jpg">
+                <p>Consider this ur christmas gift heh.</p>
+            </div>
+        </div>
+
+        <div class="slide" id="slide2">
+            <div class="content">
+                <h1>Shawty do you love me?</h1>
+                <div style="display: flex; gap: 20px; justify-content: center; margin-top: 30px;">
+                    <button onclick="answerYes()" style="font-size: 1.2em; padding: 20px 40px;">Yes</button>
+                    <button onclick="answerNo()" style="font-size: 1.2em; padding: 20px 40px;">No</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="slide" id="slideNo">
+            <div class="content">
+                <h1>So you hate me.</h1>
+                <img src="sad alpha.jpg">
+                <div class="emoji">💔</div>
+            </div>
+        </div>
+
+        <div class="slide" id="slideYes">
+            <div class="content">
+                <img src="roblox.jpg">
+                <h1>So I'm finally ur number 1 e boy</h1>
+                <div class="emoji">😎</div>
+            </div>
+        </div>
+
+        <div class="slide" id="slide3">
+            <div class="content">
+                <h1>Thank you for coming into my life Naomi</h1>
+                <img src="heart eyes.jpg">
+                <div class="emoji">💕</div>
+                <p>You make it so much better and I love you.</p>
+            </div>
+        </div>
+
+        <div class="slide" id="slide4">
+            <div class="content">
+                <h1>Me when I see you</h1>
+                <img src="drool.jpg">
+                <div class="emoji">😍</div>
+            </div>
+        </div>
+
+        <div class="slide" id="slide5">
+            <div class="content">
+                <h1>Bye cutie!</h1>
+                <img src="kick feet.jpg">
+                <div class="emoji">👋</div>
+                <p style="margin-top: 20px; color: #8b0000;">Merry Christmas! 🎄</p>
+            </div>
+        </div>
+
+        <div class="navigation">
+            <button id="prevBtn" onclick="changeSlide(-1)">← Back</button>
+            <button id="nextBtn" onclick="changeSlide(1)">Next →</button>
+        </div>
+    </div>
+
+    <script>
+        // Create snowflakes
+        function createSnowflake() {
+            const snowflake = document.createElement('div');
+            snowflake.classList.add('snowflake');
+            snowflake.innerHTML = '❄';
+            snowflake.style.left = Math.random() * 100 + '%';
+            snowflake.style.animationDuration = Math.random() * 3 + 5 + 's';
+            snowflake.style.opacity = Math.random() * 0.6 + 0.4;
+            snowflake.style.fontSize = Math.random() * 10 + 10 + 'px';
+            document.body.appendChild(snowflake);
+
+            setTimeout(() => {
+                snowflake.remove();
+            }, 8000);
+        }
+
+        setInterval(createSnowflake, 300);
+
+        let currentSlide = 1;
+        const totalSlides = 5;
+
+        function checkPassword() {
+            const input = document.getElementById('passwordInput');
+            const error = document.getElementById('errorMsg');
+            const lockScreen = document.getElementById('lockScreen');
+            const contentWrapper = document.getElementById('contentWrapper');
+            
+            if (input.value === 'Naomi') {
+                lockScreen.style.display = 'none';
+                contentWrapper.classList.add('unlocked');
+                showSlide(currentSlide);
+            } else {
+                error.classList.add('show');
+                input.value = '';
+                setTimeout(() => {
+                    error.classList.remove('show');
+                }, 2000);
+            }
+        }
+
+        document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkPassword();
+            }
+        });
+
+        function showSlide(n) {
+            const slides = document.querySelectorAll('.slide');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+
+            if (n > totalSlides) currentSlide = totalSlides;
+            if (n < 1) currentSlide = 1;
+
+            slides.forEach(slide => slide.classList.remove('active'));
+            
+            // Handle special slides
+            if (currentSlide === 2) {
+                document.getElementById('slide2').classList.add('active');
+                prevBtn.style.display = 'none';
+                nextBtn.style.display = 'none';
+                return;
+            } else {
+                prevBtn.style.display = 'inline-block';
+                nextBtn.style.display = 'inline-block';
+            }
+            
+            // Show the correct slide
+            const slideToShow = document.getElementById('slide' + currentSlide);
+            if (slideToShow) {
+                slideToShow.classList.add('active');
+            }
+
+            prevBtn.disabled = currentSlide === 1;
+            nextBtn.disabled = currentSlide === totalSlides;
+            
+            if (currentSlide === totalSlides) {
+                nextBtn.textContent = '💝';
+            } else {
+                nextBtn.textContent = 'Next →';
+            }
+        }
+
+        function answerYes() {
+            const slides = document.querySelectorAll('.slide');
+            slides.forEach(slide => slide.classList.remove('active'));
+            document.getElementById('slideYes').classList.add('active');
+            setTimeout(() => {
+                slides.forEach(slide => slide.classList.remove('active'));
+                currentSlide = 3;
+                showSlide(currentSlide);
+            }, 3000);
+        }
+
+        function answerNo() {
+            const slides = document.querySelectorAll('.slide');
+            slides.forEach(slide => slide.classList.remove('active'));
+            document.getElementById('slideNo').classList.add('active');
+            setTimeout(() => {
+                slides.forEach(slide => slide.classList.remove('active'));
+                document.getElementById('slide2').classList.add('active');
+            }, 3000);
+        }
+
+        function changeSlide(direction) {
+            currentSlide += direction;
+            showSlide(currentSlide);
+        }
+    </script>
+</body>
+</html>
